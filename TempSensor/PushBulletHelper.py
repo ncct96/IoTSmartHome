@@ -3,8 +3,13 @@ from pushbullet import *
 from TempSensor.LineChartPlotter import get_data
 from TempSensor.TemperatureModule import *
 from TempSensor.DeviceManager import *
+#from FacialRecognition.face_dataset import *
 
-token = "o.TYslgAbhFtbyO4AjFeOpOHTaI7Pz0G3Q"
+#CP's Token
+#token = "o.TYslgAbhFtbyO4AjFeOpOHTaI7Pz0G3Q"
+
+#Nicholas's Token
+token = "o.af4UdQ8rcjnFmJlYPdFCWqahaQt8418E"
 websocket_conn = "wss://stream.pushbullet.com/websocket/" + token
 websocket_query = "https://api.pushbullet.com/v2/pushes?limit=1"
 pb = PushBullet(token)
@@ -82,6 +87,9 @@ def reply_listener():
                     # SEND TEMPERATURE GRAPH
                     thread = threading.Thread(target=get_data)
                     thread.start()
+                #elif command == "!reg -user" or command == "!reg":
+                    #thread = threading.Thread(target=regFace)
+                    #thread.start()
                 else:
                     print("Invalid command")
             else:
