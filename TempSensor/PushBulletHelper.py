@@ -3,7 +3,7 @@ from pushbullet import *
 from TempSensor.LineChartPlotter import get_data
 from TempSensor.TemperatureModule import *
 from TempSensor.DeviceManager import *
-#from FacialRecognition.face_dataset import *
+from FacialRecognition.face_dataset import *
 
 #CP's Token
 #token = "o.TYslgAbhFtbyO4AjFeOpOHTaI7Pz0G3Q"
@@ -87,9 +87,9 @@ def reply_listener():
                     # SEND TEMPERATURE GRAPH
                     thread = threading.Thread(target=get_data)
                     thread.start()
-                #elif command == "!reg -user" or command == "!reg":
-                    #thread = threading.Thread(target=regFace)
-                    #thread.start()
+                elif command == "!reg -user" or command == "!reg":
+                    thread = threading.Thread(target=regFace)
+                    thread.start()
                 else:
                     print("Invalid command")
             else:

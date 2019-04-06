@@ -10,78 +10,83 @@ Developed by Marcelo Rovai - MJRoBot.org @ 21Feb18
 
 import cv2
 import numpy as np
-import os 
+import os
 
-recognizer = cv2.face.LBPHFaceRecognizer_create()
-recognizer.read('trainer/trainer.yml')
-cascadePath = "haarcascade_frontalface_default.xml"
-faceCascade = cv2.CascadeClassifier(cascadePath);
 
-font = cv2.FONT_HERSHEY_SIMPLEX
+def faceRecog():
+    recognizer = cv2.face.LBPHFaceRecognizer_create()
+    recognizer.read('trainer/trainer.yml')
+    cascadePath = "haarcascade_frontalface_default.xml"
+    faceCascade = cv2.CascadeClassifier(cascadePath);
 
-#indicate id counter
-id = 0
+    font = cv2.FONT_HERSHEY_SIMPLEX
 
-# names related to ids: example ==> Marcelo: id=1,  etc
-names = ['Nicholas', 'Joyce', 'Brandon', 'Eric']
+    # indicate id counter
+    id = 0
 
-# Initialize and start realtime video capture
-cam = cv2.VideoCapture(0)
-cam.set(3, 640) # set video widht
-cam.set(4, 480) # set video height
+    # names related to ids: example ==> Marcelo: id=1,  etc
+    names = ['Nicholas', 'Joyce', 'Brandon', 'Eric']
 
-# Define min window size to be recognized as a face
-minW = 0.1*cam.get(3)
-minH = 0.1*cam.get(4)
+    # Initialize and start realtime video capture
+    cam = cv2.VideoCapture(0)
+    cam.set(3, 640)  # set video widht
+    cam.set(4, 480)  # set video height
 
-while True:
+    # Define min window size to be recognized as a face
+    minW = 0.1 * cam.get(3)
+    minH = 0.1 * cam.get(4)
 
-    ret, img =cam.read()
-    #img = cv2.flip(img, -1) # Flip vertically
+    while True:
 
-    gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+        ret, img = cam.read()
+        # img = cv2.flip(img, -1) # Flip vertically
 
-    faces = faceCascade.detectMultiScale(
-        gray,
-        scaleFactor = 1.5,
-        minNeighbors = 5,
-        minSize = (int(minW), int(minH)),
-       )
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    for(x,y,w,h) in faces:
+        faces = faceCascade.detectMultiScale(
+            gray,
+            scaleFactor=1.5,
+            minNeighbors=5,
+            minSize=(int(minW), int(minH)),
+        )
 
-        cv2.rectangle(img, (x,y), (x+w,y+h), (0,255,0), 2)
+        for (x, y, w, h) in faces:
 
-        id, confidence = recognizer.predict(gray[y:y+h,x:x+w])
+            cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-        # Check if confidence is less them 100 ==> "0" is perfect match 
-        if (confidence < 100):
-            id = names[id]
-            similarity = 100 - confidence
-            confidence = "  {0}%".format(round(100 - confidence))
-        else:
-            id = "unknown"
-            similarity = 100 - confidence
-            confidence = "  {0}%".format(round(100 - confidence))
+            id, confidence = recognizer.predict(gray[y:y + h, x:x + w])
 
-        if(similarity >= 50):
-            print("Verified")
-            print(similarity)
+            # Check if confidence is less them 100 ==> "0" is perfect match
+            if (confidence < 100):
+                id = names[id]
+                similarity = 100 - confidence
+                confidence = "  {0}%".format(round(100 - confidence))
+            else:
+                id = "unknown"
+                similarity = 100 - confidence
+                confidence = "  {0}%".format(round(100 - confidence))
+
+            if (similarity >= 50):
+                print("Verified")
+                print(similarity)
+                break
+            else:
+                From
+                PushBulletHelper
+                import push_image
+
+                push_image("intruder.png", img)
+
+            cv2.putText(img, str(id), (x + 5, y - 5), font, 1, (255, 255, 255), 2)
+            cv2.putText(img, str(confidence), (x + 5, y + h - 5), font, 1, (255, 255, 0), 1)
+
+        cv2.imshow('camera', img)
+
+        k = cv2.waitKey(10) & 0xff  # Press 'ESC' for exiting video
+        if k == 27:
             break
-        #else:
-            #From PushBulletHelper import push_image
 
-
-        cv2.putText(img, str(id), (x+5,y-5), font, 1, (255,255,255), 2)
-        cv2.putText(img, str(confidence), (x+5,y+h-5), font, 1, (255,255,0), 1)  
-    
-    cv2.imshow('camera',img) 
-
-    k = cv2.waitKey(10) & 0xff # Press 'ESC' for exiting video
-    if k == 27:
-        break
-
-# Do a bit of cleanup
-print("\n [INFO] Exiting Program and cleanup stuff")
-cam.release()
-cv2.destroyAllWindows()
+    # Do a bit of cleanup
+    print("\n [INFO] Exiting Program and cleanup stuff")
+    cam.release()
+    cv2.destroyAllWindows()
