@@ -1,8 +1,8 @@
 import websocket
 from pushbullet import *
-from LineChartPlotter import get_data
-from TemperatureModule import *
-from DeviceManager import *
+from TempSensor.LineChartPlotter import get_data
+from TempSensor.TemperatureModule import *
+from TempSensor.DeviceManager import *
 
 token = "o.TYslgAbhFtbyO4AjFeOpOHTaI7Pz0G3Q"
 websocket_conn = "wss://stream.pushbullet.com/websocket/" + token
