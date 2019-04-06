@@ -26,13 +26,13 @@ def plot_graph():
         ax = plt.gca()
         ax.xaxis.set_label_coords(1.05, -0.025)
         plt.grid(True)
-        plt.savefig("E:/Desktop/graph.png")
+        plt.savefig("C:\\Users\\Nicholas\\Desktop\\graph.png")
         # plt.show()
     except Exception as graph_exception:
         print(graph_exception)
 
     from PushBulletHelper import push_image
-    push_image("temperature.png", "E:\\Desktop\\graph.png")
+    push_image("temperature.png", "C:\\Users\\Nicholas\\Desktop\\graph.png")
 
 
 def get_data():
