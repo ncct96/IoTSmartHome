@@ -41,7 +41,7 @@ while True:
 
     gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 
-    faces = faceCascade.detectMultiScale( 
+    faces = faceCascade.detectMultiScale(
         gray,
         scaleFactor = 1.5,
         minNeighbors = 5,
