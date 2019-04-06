@@ -11,7 +11,24 @@ Developed by Marcelo Rovai - MJRoBot.org @ 21Feb18
 import cv2
 import numpy as np
 import os
+import pyrebase
 
+config = {
+    "apiKey": "AIzaSyCd8ZWijyCfiyWvZPZ9BZ4Ajc5ynGBWVek",
+    "authDomain": "iotsmarthome-93fb2.firebaseapp.com",
+    "databaseURL": "https://iotsmarthome-93fb2.firebaseio.com",
+    "projectId": "iotsmarthome-93fb2",
+    "storageBucket": "iotsmarthome-93fb2.appspot.com",
+    "messagingSenderId": "1042090494244"
+}
+
+try:
+    firebase = pyrebase.initialize_app(config)
+    auth = firebase.auth()
+    user = auth.sign_in_with_email_and_password("testing2822@gmail.com", "ncct2822")
+    db = firebase.database()
+except Exception as pyrebase_exception:
+    print(pyrebase_exception)
 
 def faceRecog():
     recognizer = cv2.face.LBPHFaceRecognizer_create()
