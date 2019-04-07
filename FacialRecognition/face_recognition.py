@@ -12,6 +12,7 @@ import cv2
 import numpy as np
 import os
 import pyrebase
+from FacialRecognition.lock_module import *
 
 config = {
     "apiKey": "AIzaSyCd8ZWijyCfiyWvZPZ9BZ4Ajc5ynGBWVek",
@@ -86,6 +87,7 @@ def faceRecog():
             if (similarity >= 50):
                 print("Verified")
                 print(similarity)
+                unlock()
                 break
             else:
                 From
