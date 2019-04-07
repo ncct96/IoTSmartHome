@@ -1,3 +1,5 @@
+import pathlib
+
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 from pyrebase import pyrebase
@@ -11,12 +13,12 @@ config = {
     "messagingSenderId": "223998686071"
 }
 
-
 x = []
 y = []
 
 
-def plot_graph():
+def plot_graph(date):
+    from PushBulletHelper import push_image
     try:
         plt.plot(y, x)
         plt.xlabel('Time')
@@ -26,23 +28,29 @@ def plot_graph():
         ax = plt.gca()
         ax.xaxis.set_label_coords(1.05, -0.025)
         plt.grid(True)
-        plt.savefig("C:\\Users\\Nicholas\\Desktop\\graph.png")
+
+        file = 'graphs\\temperature_' + date + '.png'
+        plt.savefig(pathlib.Path(__file__).parent / file)
         # plt.show()
+        push_image("temperature.png", file)
     except Exception as graph_exception:
-        print(graph_exception)
-
-    from PushBulletHelper import push_image
-    push_image("temperature.png", "C:\\Users\\Nicholas\\Desktop\\graph.png")
+        print("Graphing exception:" + str(graph_exception))
 
 
-def get_data():
+def get_data(date):
     try:
+        x.clear()
+        y.clear()
         firebase = pyrebase.initialize_app(config)
-        auth = firebase.auth()
-        user = auth.sign_in_with_email_and_password("chiupeeng@gmail.com", "ChiuPeeng98")
         db = firebase.database()
 
-        today = datetime.now() - timedelta(1)
+        if date is None:
+            today = datetime.now() - timedelta(1)
+            # today = today.strftime("%Y-%m-%d")
+            today = today.strftime("2019-03-29")  # DEBUG
+        else:
+            today = date.strftime("%Y-%m-%d")
+
         print(today)
         for i in range(24):
             if i < 10:
@@ -50,18 +58,21 @@ def get_data():
             else:
                 hour = str(i) + "00"
 
-            # result = db.child("Temperature").child(today.strftime("%Y-%m-%d")).child(hour).get()
-            result = db.child("Temperature").child(today.strftime("2019-03-29")).child(hour).get()
+            result = db.child("Temperature").child(today).child(hour).get()
 
             if result.val() is not None:
                 items = (result.val())
                 x.append(str(items['heatIndex']))
                 y.append(hour)
-                print(hour + " heatIndex: " + str(items['heatIndex']) + " temperature: " + str(items['temperature']) + " humidity: " + str(items['humidity']))
+                print(hour + " heatIndex: " + str(items['heatIndex']) + " temperature: " + str(
+                    items['temperature']) + " humidity: " + str(items['humidity']))
             else:
-                print(hour + "00 No data")
+                print(hour + " No data")
 
-        plot_graph()
+        if len(x) < 1:
+            from PushBulletHelper import push_message
+            push_message("Oops", "No temperature data was found for that day")
+        else:
+            plot_graph(today)
     except Exception as db_exception:
-        print(db_exception)
-
+        print("Database exception:" + str(db_exception))

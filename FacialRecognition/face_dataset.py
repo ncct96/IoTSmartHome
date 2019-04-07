@@ -36,7 +36,7 @@ def regFace():
     cam.set(3, 640)  # set video width
     cam.set(4, 480)  # set video height
 
-    face_detector = cv2.CascadeClassifier('D:\\Users\\Nicholas\\PycharmProjects\\IoTSmartHome\\venv\\Lib\\site-packages\\cv2\\data\\haarcascade_frontalface_default.xml')
+    face_detector = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
     #face_detector = cv2.CascadeClassifier('D:\\Users\\Nicholas\\PycharmProjects\\IoTSmartHome\\venv\\Lib\\site-packages\\cv2\\data\\haarcascade_frontalface_default.xml')
 
     # For each person, enter one numeric face id

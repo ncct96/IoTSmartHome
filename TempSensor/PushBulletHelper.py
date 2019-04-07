@@ -1,35 +1,47 @@
 import websocket
+import threading
+from time import sleep
+from LineChartPlotter import get_data
+from TemperatureModule import temperature_monitor
 from pushbullet import *
-from TempSensor.LineChartPlotter import get_data
-from TempSensor.TemperatureModule import *
-from TempSensor.DeviceManager import *
-from FacialRecognition.face_dataset import *
 
-#CP's Token
-#token = "o.TYslgAbhFtbyO4AjFeOpOHTaI7Pz0G3Q"
+# from TempSensor.LineChartPlotter import get_data
+# from TempSensor.TemperatureModule import *
+# from TempSensor.DeviceManager import *
+# from FacialRecognition.face_dataset import *
 
-#Nicholas's Token
-token = "o.af4UdQ8rcjnFmJlYPdFCWqahaQt8418E"
-websocket_conn = "wss://stream.pushbullet.com/websocket/" + token
-websocket_query = "https://api.pushbullet.com/v2/pushes?limit=1"
-pb = PushBullet(token)
+# CP's Token
+token = "o.8IwCzcxqtCNgHRdgzQUunxxOWwVJ8czN"
+# Nicholas's Token
+# token = "o.af4UdQ8rcjnFmJlYPdFCWqahaQt8418E"
+
+while True:
+    try:
+        websocket_conn = "wss://stream.pushbullet.com/websocket/" + token
+        websocket_query = "https://api.pushbullet.com/v2/pushes?limit=1"
+        pb = PushBullet(token)
+        break
+    except Exception as conn_exception:
+        print("PushBullet initialization exception: " + str(conn_exception))
+        sleep(5)
 
 
 def push_message(title, message):
     try:
-        push = pb.push_note(title, message)
-    except Exception as exception:
-        print(exception)
+        pb.push_note(title, message)
+    except Exception as pb_exception:
+        print("PushBullet push message exception: " + str(pb_exception))
 
 
 def push_image(file_name, file_path):
+    import pathlib
     try:
         print("Pushing file")
-        with open(file_path, "rb") as pic:
+        with open(pathlib.Path(__file__).parent / file_path, "rb") as pic:
             file_data = pb.upload_file(pic, file_name)
-        push = pb.push_file(**file_data)
-    except Exception as exception:
-        print(exception)
+        pb.push_file(**file_data)
+    except Exception as img_exception:
+        print("PushBullet push file exception: " + str(img_exception))
 
 
 def reply_listener():
@@ -47,60 +59,30 @@ def reply_listener():
                     # GET TEMPERATURE
                     thread = threading.Thread(target=temperature_monitor, args=(True,))
                     thread.start()
-                elif command == "!lock -status" or command == "!lck -status":
-                    # GET LOCK STATUS
-                    thread = threading.Thread(target=None)
-                    thread.start()
-                elif command == "!light -status":
-                    # GET LIGHT STATUS
-                    thread = threading.Thread(target=None)
-                    thread.start()
-                elif command == "!fan -on":
-                    # TURN ON FAN
-                    thread = threading.Thread(target=fan_control(True))
-                    thread.start()
-                elif command == "!fan -off":
-                    # TURN OFF FAN
-                    thread = threading.Thread(target=fan_control(False))
-                    thread.start()
-                elif command == "!light -on":
-                    # TURN ON LIGHT
-                    thread = threading.Thread(target=light_control(True))
-                    thread.start()
-                elif command == "!light -off":
-                    # TURN OFF LIGHT
-                    thread = threading.Thread(target=light_control(False))
-                    thread.start()
-                elif command == "!lock -on" or command == "!lock":
-                    # ENABLE LOCK
-                    thread = threading.Thread(target=lock_door(True))
-                    thread.start()
-                elif command == "!lock -off":
-                    # DISABLE LOCK
-                    thread = threading.Thread(target=lock_door(False))
-                    thread.start()
-                elif command == "!a" or command == "!alarm" or command == "!alert":
-                    # SOUND ALARM
-                    thread = threading.Thread(target=None)
-                    thread.start()
-                elif command == "!temp -graph":
+                elif command == "!graph":
                     # SEND TEMPERATURE GRAPH
-                    thread = threading.Thread(target=get_data)
+                    thread = threading.Thread(target=get_data, args=(None,))
                     thread.start()
+                elif command.startswith("!graph"):
+                    # SEND TEMPERATURE GRAPH (DATE SPECIFIED)
+                    try:
+                        import datetime
+                        date = datetime.datetime.strptime(command[7:], '%d/%m/%Y')
+                        thread = threading.Thread(target=get_data, args=(date,))
+                        thread.start()
+                    except ValueError:
+                        push_message("Oops", "Wrong date format")
                 elif command == "!reg -user" or command == "!reg":
-                    thread = threading.Thread(target=regFace)
+                    thread = threading.Thread(target="")  # regFace
                     thread.start()
                 else:
                     print("Invalid command")
             else:
                 print("Listening...")
         except Exception as exception:
-            print(exception)
+            print("PushBullet listener exception: " + str(exception))
 
 
 def start_reply_listener():
     reply_listener_thread = threading.Thread(target=reply_listener)
     reply_listener_thread.start()
-
-
-# start_reply_listener()
