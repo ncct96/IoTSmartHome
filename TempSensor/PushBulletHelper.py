@@ -5,10 +5,10 @@ from LineChartPlotter import get_data
 from TemperatureModule import temperature_monitor
 from pushbullet import *
 
-# from TempSensor.LineChartPlotter import get_data
-# from TempSensor.TemperatureModule import *
-# from TempSensor.DeviceManager import *
-# from FacialRecognition.face_dataset import *
+# from LineChartPlotter import get_data
+# from TemperatureModule import *
+# from DeviceManager import *
+# from face_dataset import *
 
 # CP's Token
 token = "o.8IwCzcxqtCNgHRdgzQUunxxOWwVJ8czN"
@@ -50,7 +50,14 @@ def reply_listener():
     while True:
         try:
             result = ws.recv()
+            print(result)
             if result == '{"type": "tickle", "subtype": "push"}':
+                print(pb.get_pushes())
+                if "'type': 'note'" not in str(pb.get_pushes()):
+                    continue
+                if "'title': " in str(pb.get_pushes()):
+                    continue
+
                 command = str(pb.get_pushes()).split("body")[1]
                 command = command[4: -3]
                 command = command.split("'")[0]
@@ -77,6 +84,7 @@ def reply_listener():
                     thread.start()
                 else:
                     print("Invalid command")
+                    push_message("Oops", "Invalid Command")
             else:
                 print("Listening...")
         except Exception as exception:

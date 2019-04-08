@@ -1,5 +1,4 @@
 import pathlib
-
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 from pyrebase import pyrebase
@@ -17,26 +16,6 @@ x = []
 y = []
 
 
-def plot_graph(date):
-    from PushBulletHelper import push_image
-    try:
-        plt.plot(y, x)
-        plt.xlabel('Time')
-        plt.ylabel('Temperature')
-        plt.xticks(rotation=40)
-        plt.title('Temperature Variance (Yesterday)')
-        ax = plt.gca()
-        ax.xaxis.set_label_coords(1.05, -0.025)
-        plt.grid(True)
-
-        file = 'graphs\\temperature_' + date + '.png'
-        plt.savefig(pathlib.Path(__file__).parent / file)
-        # plt.show()
-        push_image("temperature.png", file)
-    except Exception as graph_exception:
-        print("Graphing exception:" + str(graph_exception))
-
-
 def get_data(date):
     try:
         x.clear()
@@ -46,8 +25,8 @@ def get_data(date):
 
         if date is None:
             today = datetime.now() - timedelta(1)
-            # today = today.strftime("%Y-%m-%d")
-            today = today.strftime("2019-03-29")  # DEBUG
+            today = today.strftime("%Y-%m-%d")
+            # today = today.strftime("2019-03-29")  # DEBUG
         else:
             today = date.strftime("%Y-%m-%d")
 
@@ -73,6 +52,22 @@ def get_data(date):
             from PushBulletHelper import push_message
             push_message("Oops", "No temperature data was found for that day")
         else:
-            plot_graph(today)
+            from PushBulletHelper import push_image
+            try:
+                plt.plot(y, x)
+                plt.xlabel('Time')
+                plt.ylabel('Temperature')
+                plt.xticks(rotation=40)
+                plt.title('Temperature Variance ' + today)
+                ax = plt.gca()
+                ax.xaxis.set_label_coords(1.05, -0.025)
+                plt.grid(True)
+
+                file = 'graphs\\temperature_' + today + '.png'
+                plt.savefig(pathlib.Path(__file__).parent / file)
+                # plt.show()
+                push_image("temperature.png", file)
+            except Exception as graph_exception:
+                print("Graphing exception:" + str(graph_exception))
     except Exception as db_exception:
         print("Database exception:" + str(db_exception))
