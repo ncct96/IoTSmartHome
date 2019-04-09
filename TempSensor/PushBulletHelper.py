@@ -1,8 +1,9 @@
 import websocket
 import threading
 from time import sleep
-from LineChartPlotter import get_data
-from TemperatureModule import temperature_monitor
+from TempSensor.LineChartPlotter import get_data
+from TempSensor.TemperatureModule import temperature_monitor
+from DoorBell.doorbell import *
 from pushbullet import *
 
 # from LineChartPlotter import get_data
@@ -11,9 +12,9 @@ from pushbullet import *
 # from face_dataset import *
 
 # CP's Token
-token = "o.8IwCzcxqtCNgHRdgzQUunxxOWwVJ8czN"
+#token = "o.8IwCzcxqtCNgHRdgzQUunxxOWwVJ8czN"
 # Nicholas's Token
-# token = "o.af4UdQ8rcjnFmJlYPdFCWqahaQt8418E"
+token = "o.GSc5FMrwnfGFMOcRissnRljowsoBbId2"
 
 while True:
     try:
@@ -52,13 +53,14 @@ def reply_listener():
             result = ws.recv()
             print(result)
             if result == '{"type": "tickle", "subtype": "push"}':
-                print(pb.get_pushes())
-                if "'type': 'note'" not in str(pb.get_pushes()):
+                push = str(pb.get_pushes())
+
+                if "'type': 'note'" not in push:
                     continue
-                if "'title': " in str(pb.get_pushes()):
+                if "'title': " in push:
                     continue
 
-                command = str(pb.get_pushes()).split("body")[1]
+                command = push.split("body")[1]
                 command = command[4: -3]
                 command = command.split("'")[0]
                 print(command)
@@ -79,8 +81,14 @@ def reply_listener():
                         thread.start()
                     except ValueError:
                         push_message("Oops", "Wrong date format")
-                elif command == "!reg -user" or command == "!reg":
+                elif command == "!lock":
                     thread = threading.Thread(target="")  # regFace
+                    thread.start()
+                elif command == "!unlock":
+                    thread = threading.Thread(target="")
+                    thread.start()
+                elif command == "!capture":
+                    thread = threading.Thread(target=captureVisitor)
                     thread.start()
                 else:
                     print("Invalid command")
@@ -94,3 +102,5 @@ def reply_listener():
 def start_reply_listener():
     reply_listener_thread = threading.Thread(target=reply_listener)
     reply_listener_thread.start()
+
+#pb.delete_pushes()
